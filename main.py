@@ -21,6 +21,9 @@ def get_post_link(owner_id, domain, offset, count):
 def get_first_post(owner_id, domain):
     try:
         posts = requests.get(get_post_link(owner_id, domain, '0', '1')).json()
+        if 'error' in posts:
+            print('Запрос не прошел, некорректная группа. error_code: ' + posts)
+            return None
         if 'response' in posts and 'items' in posts['response'] and posts['response']['items']:
             first_post = posts['response']['items'][0]
             if 'is_pinned' in first_post and first_post['is_pinned'] == 1:
@@ -28,31 +31,28 @@ def get_first_post(owner_id, domain):
             else:
                 return posts
         else:
-            print("No items found in the response")
+            print(f"В группе {domain} нет постов")
             return None
     except Exception as e:
-        print(f"Error getting the first post: {e}")
+        print(f"Критическая ошибка get_first_post: {e}")
         return None
 
 
 def get_post_text(owner_id, domain):
     first_post = get_first_post(owner_id, domain)
-    if first_post and 'response' in first_post and 'items' in first_post['response'] and first_post['response']['items']:
-        try:
-            attachments = first_post['response']['items'][0].get('attachments', [])
-            additional_text = first_post['response']['items'][0].get('text', '')
-            post = additional_text
-            if attachments:
-                type_post = attachments[0]['type']
-                post = attachments[0][type_post]['description']
-            return post + '\n' + additional_text
-        except KeyError:
-            print("Key error while parsing the response")
-            return None
-    else:
-        print("No items found in the response")
+    try:
+        attachments = first_post['response']['items'][0]['attachments']
+        type_post = attachments[0]['type']
+        post = attachments[0][type_post]['description']
+        return post
+    except Exception as e:
+        print('')
+    try:
+        additional_text = first_post['response']['items'][0]['text']
+        return additional_text
+    except Exception as e:
+        print('Похоже в посте нет никакого текста. ' + e)
         return None
-
 
 
 def get_owner_id(link):
@@ -124,5 +124,6 @@ def main():
         time.sleep(2)
 
 
-th1 = Thread(target=bot_main).start()
-th2 = Thread(target=main).start()
+if __name__ == '__main__':
+    th1 = Thread(target=bot_main).start()
+    th2 = Thread(target=main).start()
