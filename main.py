@@ -40,23 +40,27 @@ def get_first_post(owner_id, domain):
 
 def get_post_text(owner_id, domain):
     first_post = get_first_post(owner_id, domain)
-    try:
-        attachments = first_post['response']['items'][0]['attachments']
-        type_post = attachments[0]['type']
-        post = attachments[0][type_post]['description']
-        return post
-    except Exception as e:
-        print('')
-    try:
-        additional_text = first_post['response']['items'][0]['text']
-        return additional_text
-    except Exception as e:
-        print('Похоже в посте нет никакого текста. ' + e)
+    if first_post:
+        try:
+            attachments = first_post['response']['items'][0]['attachments']
+            type_post = attachments[0]['type']
+            post = attachments[0][type_post]['description']
+            return post
+        except Exception as e:
+            print('')
+        try:
+            additional_text = first_post['response']['items'][0]['text']
+            return additional_text
+        except Exception as e:
+            print('Похоже в посте нет никакого текста. ' + e)
+            return None
+    else:
         return None
 
 
 def get_owner_id(link):
     name = link.replace('https://vk.com/', '', 1)
+    name = link.replace('http://vk.com/', '', 1)
     return '-' + str(requests.get(
         'https://api.vk.com/method/utils.resolveScreenName?screen_name=' + name + '&access_token=50934c3550934c3550934c354550e8167b5509350934c353283b43e2d4451cd19e0fafb&v=5.131').json()[
                          'response']['object_id'])
@@ -102,7 +106,7 @@ def main():
         f = open('service_files/post_id_file.txt', 'r', encoding="utf-8").read()
         domains = open('configuration_files/groups.txt', 'r', encoding="utf-8").read().split(' ')
         for x in range(len(domains)):
-            domain = domains[x].replace('https://vk.com/', '', 1)
+            domain = domains[x].replace('https://vk.com/', '', 1).replace('http://vk.com/', '', 1)
             owner_id = get_owner_id(domain)
             time.sleep(1)
             first_post = get_first_post(owner_id, domain)

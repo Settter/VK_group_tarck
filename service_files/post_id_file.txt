@@ -1,1 +1,1 @@
-mirealab = 2104  modifenpc = 8  
+kudrovhouse = 15623  progress_kudrovo = 11380  avstriyskiy = 8981  jkevropeyskiy = 14118  okkervil_kapital = 15891  vesna_vesna2 = 9345  flagman_kudrovo = 7967  berezovaya_rosha_kudrovo = 12352  vernisaj_kudrovo = 23776  spd_kudrovo = 11657  
