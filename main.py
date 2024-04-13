@@ -47,7 +47,17 @@ def get_post_text(owner_id, domain):
             post = attachments[0][type_post]['description']
             return post
         except Exception as e:
-            print('')
+            try:
+                attachments = first_post['response']['items'][0]['copy_history'][0]['attachments']
+                type_post = attachments[0]['type']
+                post = attachments[0][type_post]['description']
+                return post
+            except Exception as e:
+                try:
+                    text = first_post['response']['items'][0]['text']
+                    return text
+                except Exception as e:
+                    print('3 Exeption get_post_text', e, owner_id, domain)
         try:
             additional_text = first_post['response']['items'][0]['text']
             return additional_text
